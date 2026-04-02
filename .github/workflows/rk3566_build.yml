@@ -13,7 +13,7 @@ on:
       use_arm_tf:
         description: Use ARM Trusted Firmware for BL31 (if unchecked, uses Rockchip BL31)
         required: true
-        default: true
+        default: false
         type: boolean
       cherry_pick_commit:
         description: Enter u-boot commit(s) to cherry-pick (optional, comma-separated)
@@ -32,36 +32,8 @@ jobs:
     strategy:
       matrix:
         board:
-          - name: rk3566-anbernic-rgxx3
-            config: anbernic-rgxx3-rk3566_defconfig
           - name: rk3566-lckfb-tspi
             config: lckfb-tspi-rk3566_defconfig
-          - name: rk3566-nanopi-r3s
-            config: nanopi-r3s-rk3566_defconfig
-          - name: rk3566-odroid-m1s
-            config: odroid-m1s-rk3566_defconfig
-          - name: rk3566-orangepi-3b
-            config: orangepi-3b-rk3566_defconfig
-          - name: rk3566-pinetab2
-            config: pinetab2-rk3566_defconfig
-          - name: rk3566-powkiddy-x55
-            config: powkiddy-x55-rk3566_defconfig
-          - name: rk3566-quartz64-a
-            config: quartz64-a-rk3566_defconfig
-          - name: rk3566-quartz64-b
-            config: quartz64-b-rk3566_defconfig
-          - name: rk3566-radxa-cm3-io
-            config: radxa-cm3-io-rk3566_defconfig
-          - name: rk3566-radxa-zero-3
-            config: radxa-zero-3-rk3566_defconfig
-          - name: rk3566-rock-3c
-            config: rock-3c-rk3566_defconfig
-          - name: rk3566-soquartz-blade
-            config: soquartz-blade-rk3566_defconfig
-          - name: rk3566-soquartz-cm4
-            config: soquartz-cm4-rk3566_defconfig
-          - name: rk3566-soquartz-model-a
-            config: soquartz-model-a-rk3566_defconfig
       fail-fast: true
 
     steps:
@@ -129,7 +101,7 @@ jobs:
           cd u-boot
           make mrproper
           make ${{ matrix.board.config }}
-          make -j$(nproc) KCFLAGS="-Werror"
+          make -j$(nproc) KCFLAGS="-Werror" ROCKCHIP_TPL=$ROCKCHIP_TPL BL31=$BL31 TEE=
           tools/mkimage -l u-boot.itb
           mkdir -p ../output/${{ matrix.board.name }}/base-files
           cp idbloader*.img u-boot.itb ../output/${{ matrix.board.name }}/base-files/ 2>/dev/null || true
